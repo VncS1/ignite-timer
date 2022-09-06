@@ -5,9 +5,9 @@ import 'styled-components'
 
 import { defaultTheme } from '../styles/themes/default'
 
-type ThemeType = typeof defaultTheme;
+type ThemeType = typeof defaultTheme
 
-//criando uma tipagem pro styled components
+// criando uma tipagem pro styled components
 declare module 'styled-components' {
-   export interface DefaultTheme extends ThemeType {} 
+  export interface DefaultTheme extends ThemeType {}
 }
