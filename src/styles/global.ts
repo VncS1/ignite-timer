@@ -14,8 +14,9 @@ export const GlobalStyle = createGlobalStyle`
 
     body {
         background: ${(props) =>
-          props.theme['gray-900']}; //Utilizando [] pois a variavel tem hífen
+        props.theme['gray-900']}; //Utilizando [] pois a variavel tem hífen
         color: ${(props) => props.theme['gray-300']};
+        -webkit-font-smoothing: antialiased;
     }
 
     body, input, textarea, button {
