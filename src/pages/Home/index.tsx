@@ -51,11 +51,18 @@ export function Home() {
 
   const activeCycle = cycles.find(cycle => cycle.id === activeCycleId)
 
+  //toda vez que o activeCycle muda, chama o useEffect
   useEffect(() => {
+    let interval: number
+
     if(activeCycle){
-      setInterval(() => {
+      interval = setInterval(() => {
         setAmountSecondsPassed(differenceInSeconds(new Date(), activeCycle.startDate)) //Diferença em segundos da data atual com o inicio do ciclo
       },1000)
+    }
+
+    return () => { //quando executar o useEffect novamente, vai resetar oq tava fazendo antes
+      clearInterval(interval)
     }
   }, [activeCycle])
 
@@ -71,6 +78,7 @@ export function Home() {
 
     setCycles((state) => [...cycles, newCycle])//pegando todos os ciclos anteriores e juntando com o novo
     setActiveCycleId(id)
+    setAmountSecondsPassed(0)//Resetando a variavel
 
     reset() //Função do react hook form pra resetar o form após o submit (ele volta pros valores setados acima no defaultValues)
   }
@@ -85,7 +93,11 @@ export function Home() {
   const minutes = String(minutesAmount).padStart(2, '0')//Sempre ter dois caracteres, se não tiver, colocar um 0 no começo dela
   const seconds = String(secondsAmount).padStart(2, '0')//Sempre ter dois caracteres, se não tiver, colocar um 0 no começo dela
 
-
+  useEffect(() => {
+    if(activeCycle){
+      document.title = `${minutes}:${seconds}` //atualizando o titulo da pagina de acordo com o tempo somente se tiver um ciclo ativo
+    }
+  }, [minutes, seconds, activeCycle])
 
   const task = watch('task') //Pegar o valor do input task em tempo real, task pois é oq foi nomeado no ...register
   const isSubmitDisabled = !task //Variável apenas para auxiliar e melhorar a legibilidade do código
