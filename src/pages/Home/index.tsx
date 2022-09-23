@@ -3,15 +3,17 @@ import { HandPalm, Play } from "phosphor-react";
 import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod' //@hookform/resolvers é uma biblioteca e zod é outra. a primeira serve pro react-hook-form se integrar com a segunda
 import * as zod from 'zod'
-import { createContext, useState } from "react";
+import { useContext } from "react";
+import { NewCycleForm } from "./components/NewCycleForm";
+import { Countdown } from "./components/Countdown";
+import { CyclesContext } from "../../contexts/CyclesContext";
+
 
 import {
   HomeContainer,
   StartCountdownButton,
   StopCountdownButton
 } from "./styles";
-import { NewCycleForm } from "./components/NewCycleForm";
-import { Countdown } from "./components/Countdown";
 
 //Esquema de validação, ou seja, como será feita a validação dos formulários
 const newCycleFormValidationSchema = zod.object({ //zod.object pois estou validando um objeto
@@ -26,7 +28,7 @@ type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema> /* pegand
 
 
 export function Home() {
-
+  const { createNewCycle, interruptCurrentCycle, activeCycle} = useContext(CyclesContext)
  
 
   const newCycleForm = useForm<NewCycleFormData>/* passando uma interface pro form saber quais os campos */({
@@ -39,14 +41,17 @@ export function Home() {
 
   const { handleSubmit, watch, reset } = newCycleForm
 
-
+  function handleCreateNewCycle(data: NewCycleFormData){ //Criando essa função para não precisar chamar a função reset() do react-hook-form
+    createNewCycle(data);                                //no contexto, assim não precisando importar nada lá que não seja padrão do react
+    reset()
+  }
 
   const task = watch('task') //Pegar o valor do input task em tempo real, task pois é oq foi nomeado no ...register
   const isSubmitDisabled = !task //Variável apenas para auxiliar e melhorar a legibilidade do código
 
   return (
     <HomeContainer>
-      <form action="" onSubmit={handleSubmit(handleCreateNewCycle)}> pegar os dados do formulário no submit
+      <form action="" onSubmit={handleSubmit(handleCreateNewCycle)}> {/* pegar os dados do formulário no submit */}
 
         {/* Form provider é a forma de usar o context do react hook forms */}
         <FormProvider {...newCycleForm}>
@@ -55,7 +60,7 @@ export function Home() {
         <Countdown />
 
         {activeCycle ? (
-          <StopCountdownButton type="button" onClick={handleInterruptCycle}>
+          <StopCountdownButton type="button" onClick={interruptCurrentCycle}>
             <HandPalm size={24} />
             Interromper
           </StopCountdownButton>

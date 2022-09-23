@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, ReactNode, useState } from "react";
 
 interface CreateCycleData {
     task: string
@@ -16,19 +16,25 @@ interface Cycle {
 
 
 interface CyclesContextType {
+    cycles: Cycle[]
     activeCycle: Cycle | undefined
     activeCycleId: string | null
     amountSecondsPassed: number
     markCurrentCycleAsFinished: () => void //falando q é uma função q n tem retorno nem parametros
     setSecondsPassed: (seconds: number) => void
-    createNewCycle: () => void
+    createNewCycle: (data: CreateCycleData) => void
     interruptCurrentCycle: () => void
+}
+
+interface CyclesContextProviderProps {
+    children: ReactNode //children pois no app tem um componente filho do CyclesContextProvider, então precisa avisar isso
 }
 
 export const CyclesContext = createContext({} as CyclesContextType)
 
 
-export function CyclesContextProvider() {
+
+export function CyclesContextProvider({ children }: CyclesContextProviderProps) {
     const [cycles, setCycles] = useState<Cycle[]>([])
     const [activeCycleId, setActiveCycleId] = useState<string | null>(null)//Pode ser null pois pode não ter nenhum ciclo ativo
     const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
@@ -65,7 +71,7 @@ export function CyclesContextProvider() {
         setActiveCycleId(id)
         setAmountSecondsPassed(0)//Resetando a variavel
 
-        reset() //Função do react hook form pra resetar o form após o submit (ele volta pros valores setados acima no defaultValues)
+        //reset() //Função do react hook form pra resetar o form após o submit (ele volta pros valores setados acima no defaultValues)
     }
 
     function interruptCurrentCycle() {
@@ -92,10 +98,11 @@ export function CyclesContextProvider() {
                 amountSecondsPassed,
                 setSecondsPassed,
                 createNewCycle,
-                interruptCurrentCycle
+                interruptCurrentCycle,
+                cycles
             }}
         >
-
+            {children}
         </CyclesContext.Provider>
     )
 }
