@@ -1,5 +1,5 @@
 import { differenceInSeconds } from "date-fns";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { CyclesContext } from "../../../../contexts/CyclesContext";
 import { CountdownContainer, Separator } from "./styles";
 
@@ -14,8 +14,8 @@ export function Countdown() {
         let interval: number
 
         if (activeCycle) {
-            interval = setInterval(() => {
-                const secondsDifference = differenceInSeconds(new Date(), activeCycle.startDate) //Diferença em segundos da data atual com o inicio do ciclo
+            interval = setInterval(() => {                                         //se for string converte em data, se for data não acontece nada
+                const secondsDifference = differenceInSeconds(new Date(), new Date(activeCycle.startDate)) //Diferença em segundos da data atual com o inicio do ciclo
 
                 if (secondsDifference >= totalSeconds) { //Vendo se o tempo acabou
                     markCurrentCycleAsFinished()

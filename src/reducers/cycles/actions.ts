@@ -16,20 +16,14 @@ export function addNewCycleAction(newCycle: Cycle) {
     }
 }
 
-export function interruptCurrentCycleAction(activeCycleId: string) {
+export function interruptCurrentCycleAction() {
     return {
         type: ActionTypes.INTERRUPT_CURRENT_CYCLE, //a ação que será tomada
-        payload: {
-            activeCycleId, //o que vai ser enviado
-        }
     }
 }
 
-export function markCurrentCycleAsFinishedAction(activeCycleId: string) {
+export function markCurrentCycleAsFinishedAction() {
     return {
         type: ActionTypes.MARK_CURRENT_CYCLE_AS_FINISHED, //a ação que será tomada
-        payload: {
-            activeCycleId, //o que vai ser enviado
-        }
     }
 }
