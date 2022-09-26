@@ -1,17 +1,10 @@
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useState, useReducer } from "react";
+import { ActionTypes, addNewCycleAction, interruptCurrentCycleAction, markCurrentCycleAsFinishedAction } from "../reducers/cycles/actions";
+import { Cycle, cyclesReducer } from '../reducers/cycles/reducer'
 
 interface CreateCycleData {
     task: string
     minutesAmount: number
-}
-
-interface Cycle {
-    id: string;
-    task: string
-    minutesAmount: number,
-    startDate: Date,
-    interruptedDate?: Date
-    finishedDate?: Date
 }
 
 
@@ -35,22 +28,28 @@ export const CyclesContext = createContext({} as CyclesContextType)
 
 
 export function CyclesContextProvider({ children }: CyclesContextProviderProps) {
-    const [cycles, setCycles] = useState<Cycle[]>([])
-    const [activeCycleId, setActiveCycleId] = useState<string | null>(null)//Pode ser null pois pode não ter nenhum ciclo ativo
+
+    //dois parametros, uma função e o valor inicial, e essa função recebe dois parametros, state = valor em tempo real da variavel,
+    //e uma action, qual ação o usuário ta querendo realizar na variavel
+
+    //dispatch pois é uma variavel pra disparar algum funcionamento
+    const [cyclesState, dispatch] = useReducer(cyclesReducer , {
+        cycles: [],
+        activeCycleId: null
+    })
+
+
+
+
     const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+
+    const { cycles, activeCycleId } = cyclesState;
 
     const activeCycle = cycles.find(cycle => cycle.id === activeCycleId)
 
     //função para não precisar enviar o setCycles inteiro pelo context
     function markCurrentCycleAsFinished() {
-        setCycles(state => state.map((cycle) => {
-            if (cycle.id === activeCycleId) { //percorre os ciclos, se o ciclo for interrompido, salva a data em que a ação ocorreu
-                return { ...cycle, finishedDate: new Date() }
-            } else {
-                return cycle
-            }
-        })
-        )
+        dispatch(markCurrentCycleAsFinishedAction(activeCycleId))
     }
 
     function setSecondsPassed(seconds: number) {
@@ -67,26 +66,13 @@ export function CyclesContextProvider({ children }: CyclesContextProviderProps) 
             startDate: new Date(),
         }
 
-        setCycles((state) => [...cycles, newCycle])//pegando todos os ciclos anteriores e juntando com o novo
-        setActiveCycleId(id)
-        setAmountSecondsPassed(0)//Resetando a variavel
+        dispatch(addNewCycleAction(newCycle))
 
-        //reset() //Função do react hook form pra resetar o form após o submit (ele volta pros valores setados acima no defaultValues)
+        setAmountSecondsPassed(0)//Resetando a variavel
     }
 
     function interruptCurrentCycle() {
-        setActiveCycleId(null) //voltando o ciclo ativo pro padrão
-        setCycles(state => state.map((cycle) => {
-            if (cycle.id === activeCycleId) { //percorre os ciclos, se o ciclo for interrompido, salva a data em que a ação ocorreu
-                return { ...cycle, interruptedDate: new Date() }
-            } else {
-                return cycle
-            }
-        }))
-
-        setActiveCycleId(null) //voltando o ciclo ativo pro padrão
-
-
+        dispatch(interruptCurrentCycleAction(activeCycleId))
     }
 
     return (
