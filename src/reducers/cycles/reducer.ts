@@ -33,7 +33,7 @@ export function cyclesReducer(state: CyclesState, action: any) {
 
             return produce(state, draft => {
                 draft.cycles.push(action.payload.newCycle),
-                    draft.activeCycleId = action.payload.newCycle.id
+                draft.activeCycleId = action.payload.newCycle.id
             })
 
         case ActionTypes.INTERRUPT_CURRENT_CYCLE: {
